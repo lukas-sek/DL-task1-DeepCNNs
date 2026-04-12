@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Dataset archives and raw data
+*.zip
+*.tar.gz
+*.tar.bz2
+*.h5
+*.hdf5
+data/train/
+data/val/
+data/test/
+data_tiny/
+
+# Model checkpoints and weights
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.safetensors
+
+# Training runs (TensorBoard, metrics, plots)
+runs/
+
+# Figures / generated plots
+figures/
+
+# Report outputs
+report/*.pdf
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.bbl
+report/*.blg
+report/*.synctex.gz
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*~
