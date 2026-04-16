@@ -3,11 +3,11 @@
 <!-- STATUS: OPTIONAL — populate if transfer_frozen / transfer_finetune experiments run -->
 
 ## Setup
-Pretrained backbone: ResNet50 (ImageNet weights via torchvision)
-Input size: 224×224 (required by ResNet)
+Pretrained backbone: ResNet18 (ImageNet weights via torchvision)
+Input size: 224×224 (typical for ResNet)
 
 **Strategy A — Feature extraction:** backbone frozen, only the classification head trained.
-**Strategy B — Fine-tuning:** last 2 residual blocks unfrozen, trained with lr=1e-4; head trained with lr=1e-3.
+**Strategy B — Full fine-tuning:** all layers unfrozen, trained with lr=1e-4.
 
 ## Results
 <!-- POPULATED BY RALPH LOOP after transfer experiments are in -->

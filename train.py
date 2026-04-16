@@ -32,6 +32,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
+import torchvision.models as models
 
 from mame_dataset import get_dataloaders, IMAGENET_MEAN, IMAGENET_STD
 
@@ -164,6 +165,25 @@ class ResidualCNN(nn.Module):
 
 # ─── Model factory ──────────────────────────────────────────────────────────
 
+def build_transfer_model(name: str, num_classes: int = 29) -> nn.Module:
+    """
+    Builds a ResNet18 model pretrained on ImageNet for transfer learning.
+    """
+    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+    
+    if name == "transfer_frozen":
+        # Freeze backbone parameters
+        for param in model.parameters():
+            param.requires_grad = False
+            
+    # Sub the final fully-connected layer (ResNet uses 'fc')
+    in_features = model.fc.in_features
+    # The new linear layer is unfrozen by default (requires_grad=True)
+    model.fc = nn.Linear(in_features, num_classes)
+    
+    return model
+
+
 def build_model(name: str, dropout: float, input_size: int, use_batchnorm: bool, num_classes: int = 29) -> nn.Module:
     """
     name options:
@@ -173,7 +193,12 @@ def build_model(name: str, dropout: float, input_size: int, use_batchnorm: bool,
         residual_small  — residual CNN, small  (underfitting config)
         residual        — residual CNN, medium (main non-standard model)
         residual_large  — residual CNN, large  (overfitting config)
+        transfer_frozen — Pretrained ResNet18 (frozen backbone)
+        transfer_finetune — Pretrained ResNet18 (full fine-tuning)
     """
+    if name in ["transfer_frozen", "transfer_finetune"]:
+        return build_transfer_model(name, num_classes)
+
     configs = {
         "tiny":            {"type": "standard", "channels": [16, 32],                "fc": 128},
         "standard_small":  {"type": "standard", "channels": [32, 64, 128],           "fc": 256},
@@ -310,7 +335,8 @@ def parse_args():
     # Model
     p.add_argument("--model",       type=str,   default="standard_small",
                    choices=["tiny", "standard_small", "standard_large",
-                             "residual_small", "residual", "residual_large"])
+                             "residual_small", "residual", "residual_large",
+                             "transfer_frozen", "transfer_finetune"])
     p.add_argument("--dropout",     type=float, default=0.0,      help="Dropout probability (0=off)")
     p.add_argument("--no_batchnorm",action="store_true",          help="Disable BatchNorm (standard CNN only)")
 
