@@ -1,18 +1,3 @@
-"""
-MAMe Dataset Utilities
-----------------------
-Handles data loading, normalization and augmentation for the MAMe 256x256 dataset.
-
-Expected directory layout (ImageFolder-compatible):
-    DATA_DIR/
-        train/
-            <class_name>/   (29 classes, 700 images each)
-        val/
-            <class_name>/   (29 classes, 50 images each)
-        test/
-            <class_name>/   (29 classes, unbalanced)
-"""
-
 import json
 import time
 from pathlib import Path
@@ -22,29 +7,15 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 
-# ─── ImageNet stats (good default when training from scratch too) ────────────
-# Override with compute_normalization_stats() if you want MAMe-specific values.
+
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD  = [0.229, 0.224, 0.225]
 
-NUM_CLASSES = 29  # full MAMe dataset; overridden at runtime by the actual folder count
+NUM_CLASSES = 29 
 
-
-# ─── Transforms ─────────────────────────────────────────────────────────────
 
 def get_transforms(input_size: int, augment: bool, mean=IMAGENET_MEAN, std=IMAGENET_STD):
-    """
-    Returns (train_transform, eval_transform).
-
-    Parameters
-    ----------
-    input_size : int
-        Square input size fed to the network (e.g. 128 or 224).
-    augment : bool
-        Whether to apply data augmentation to the training transform.
-    mean, std : list of float
-        Per-channel normalization statistics.
-    """
+    
     normalize = transforms.Normalize(mean=mean, std=std)
 
     eval_transform = transforms.Compose([
@@ -69,8 +40,6 @@ def get_transforms(input_size: int, augment: bool, mean=IMAGENET_MEAN, std=IMAGE
     return train_transform, eval_transform
 
 
-# ─── Datasets & DataLoaders ──────────────────────────────────────────────────
-
 def get_dataloaders(
     data_dir: str | Path,
     input_size: int = 128,
@@ -80,29 +49,6 @@ def get_dataloaders(
     mean=IMAGENET_MEAN,
     std=IMAGENET_STD,
 ):
-    """
-    Build train / val / test DataLoaders from an ImageFolder-compatible directory.
-
-    Parameters
-    ----------
-    data_dir : path-like
-        Root directory containing train/, val/, test/ subdirectories.
-    input_size : int
-        Square input resolution for the network.
-    batch_size : int
-    augment : bool
-        Enable data augmentation on the training set.
-    num_workers : int
-        Number of DataLoader worker processes.
-    mean, std : list of float
-        Normalization statistics (default: ImageNet).
-
-    Returns
-    -------
-    dict with keys 'train', 'val', 'test' → DataLoader
-    dict with keys 'train', 'val', 'test' → Dataset
-    list of class names (length 29)
-    """
     data_dir = Path(data_dir)
     train_tf, eval_tf = get_transforms(input_size, augment, mean, std)
 
@@ -129,19 +75,7 @@ def get_dataloaders(
 
     return loaders, datasets_dict, class_names
 
-
-# ─── Normalization stats computation ────────────────────────────────────────
-
 def compute_normalization_stats(data_dir: str | Path, input_size: int = 128, batch_size: int = 64):
-    """
-    Compute per-channel mean and std over the training set.
-    Run once and save the result; pass to get_dataloaders() afterwards.
-
-    Returns
-    -------
-    mean : list of float (length 3)
-    std  : list of float (length 3)
-    """
     data_dir = Path(data_dir)
     transform = transforms.Compose([
         transforms.Resize((input_size, input_size)),
@@ -164,9 +98,6 @@ def compute_normalization_stats(data_dir: str | Path, input_size: int = 128, bat
     std  /= n
     print(f"  mean={mean.tolist()}  std={std.tolist()}  ({time.time()-t0:.1f}s)")
     return mean.tolist(), std.tolist()
-
-
-# ─── Quick sanity check ──────────────────────────────────────────────────────
 
 def dataset_summary(data_dir: str | Path):
     """Print a quick summary of the dataset directory."""

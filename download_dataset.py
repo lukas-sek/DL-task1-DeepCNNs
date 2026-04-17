@@ -1,18 +1,3 @@
-"""
-MAMe Dataset Downloader
------------------------
-Downloads the MAMe 256x256 dataset from Kaggle and extracts it.
-
-Usage:
-    python download_dataset.py [--dest PATH]
-
-Requirements:
-    - kaggle package: pip install kaggle
-    - Kaggle API credentials in ~/.kaggle/kaggle.json
-      { "username": "YOUR_KAGGLE_USERNAME", "key": "YOUR_API_KEY" }
-      Get your key at: https://www.kaggle.com/settings → API → Create New Token
-"""
-
 import argparse
 import os
 import zipfile

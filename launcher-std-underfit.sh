@@ -1,18 +1,3 @@
-#!/bin/bash
-# Phase 1 — Standard CNN — Underfitting
-# Goal: confirm model is too small to memorise training data
-# Expected: low train acc, val acc ≈ train acc  →  underfitting confirmed
-#
-# sbatch -A nct_367 -q acc_training launcher-std-underfit.sh
-
-#SBATCH --job-name="std-underfit"
-#SBATCH --chdir=.
-#SBATCH --output=logs/std-underfit_%j.out
-#SBATCH --error=logs/std-underfit_%j.err
-#SBATCH --time=02:00:00
-#SBATCH --cpus-per-task=40
-#SBATCH --gres=gpu:1
-
 mkdir -p logs
 
 module purge

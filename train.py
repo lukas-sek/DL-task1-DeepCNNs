@@ -1,27 +1,3 @@
-#!/usr/bin/env python
-"""
-MAMe CNN Trainer
-----------------
-Main training script for Practical Work 1.
-Supports standard and non-standard CNN architectures with configurable hyperparameters.
-
-Usage examples:
-    # Pipeline test (1 epoch, tiny model)
-    python train.py --data_dir data --epochs 1 --model tiny --batch_size 64
-
-    # Standard CNN — underfitting config
-    python train.py --data_dir data --epochs 30 --model standard_small
-
-    # Standard CNN — overfitting config
-    python train.py --data_dir data --epochs 60 --model standard_large --no_augment
-
-    # Standard CNN — regularized
-    python train.py --data_dir data --epochs 60 --model standard_large --augment --dropout 0.5 --weight_decay 1e-4
-
-    # Non-standard CNN (residual blocks)
-    python train.py --data_dir data --epochs 60 --model residual --augment --dropout 0.4
-"""
-
 import argparse
 import json
 import sys
@@ -37,27 +13,7 @@ import torchvision.models as models
 from mame_dataset import get_dataloaders, IMAGENET_MEAN, IMAGENET_STD
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# Architectures
-# ════════════════════════════════════════════════════════════════════════════
-
 class StandardCNN(nn.Module):
-    """
-    Standard CNN: Conv → BN → ReLU → Pool repeated N times, then FC layers.
-
-    Parameters
-    ----------
-    channels : list of int
-        Number of filters per conv block, e.g. [32, 64, 128].
-    fc_size : int
-        Size of the hidden fully-connected layer.
-    dropout : float
-        Dropout probability after the FC hidden layer (0 = disabled).
-    input_size : int
-        Spatial input resolution (square). Used to infer FC input dimension.
-    use_batchnorm : bool
-        Whether to add BatchNorm after each conv layer.
-    """
 
     def __init__(self, channels, fc_size, num_classes, dropout=0.0, input_size=128, use_batchnorm=True):
         super().__init__()
@@ -92,7 +48,6 @@ class StandardCNN(nn.Module):
         return self.classifier(x)
 
 
-# ─── Residual block ─────────────────────────────────────────────────────────
 
 class ResidualBlock(nn.Module):
     """
@@ -125,7 +80,6 @@ class ResidualBlock(nn.Module):
 class ResidualCNN(nn.Module):
     """
     Non-standard CNN using residual blocks.
-    Architecture: stem conv → N residual stages (each doubles channels, halves spatial) → GAP → FC
     """
 
     def __init__(self, channels, num_classes, dropout=0.0, input_size=128):
@@ -138,7 +92,7 @@ class ResidualCNN(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-        # Residual stages — each stage has 2 residual blocks; first block uses stride=2 to downsample
+        # Residual stages
         stages = []
         in_ch = channels[0]
         for out_ch in channels[1:]:
@@ -163,8 +117,6 @@ class ResidualCNN(nn.Module):
         return self.classifier(x)
 
 
-# ─── Model factory ──────────────────────────────────────────────────────────
-
 def build_transfer_model(name: str, num_classes: int = 29) -> nn.Module:
     """
     Builds a ResNet18 model pretrained on ImageNet for transfer learning.
@@ -176,26 +128,14 @@ def build_transfer_model(name: str, num_classes: int = 29) -> nn.Module:
         for param in model.parameters():
             param.requires_grad = False
             
-    # Sub the final fully-connected layer (ResNet uses 'fc')
     in_features = model.fc.in_features
-    # The new linear layer is unfrozen by default (requires_grad=True)
+    # The new linear layer is unfrozen by default
     model.fc = nn.Linear(in_features, num_classes)
     
     return model
 
 
 def build_model(name: str, dropout: float, input_size: int, use_batchnorm: bool, num_classes: int = 29) -> nn.Module:
-    """
-    name options:
-        tiny            — 2-block standard CNN, minimal width (underfitting baseline)
-        standard_small  — 3-block standard CNN, small width  (underfitting config)
-        standard_large  — 5-block standard CNN, large width  (overfitting config)
-        residual_small  — residual CNN, small  (underfitting config)
-        residual        — residual CNN, medium (main non-standard model)
-        residual_large  — residual CNN, large  (overfitting config)
-        transfer_frozen — Pretrained ResNet18 (frozen backbone)
-        transfer_finetune — Pretrained ResNet18 (full fine-tuning)
-    """
     if name in ["transfer_frozen", "transfer_finetune"]:
         return build_transfer_model(name, num_classes)
 
@@ -227,10 +167,6 @@ def build_model(name: str, dropout: float, input_size: int, use_batchnorm: bool,
 def count_parameters(model: nn.Module) -> int:
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-
-# ════════════════════════════════════════════════════════════════════════════
-# Training & evaluation loops  (same structure as MNIST example)
-# ════════════════════════════════════════════════════════════════════════════
 
 def model_train(device, model, data_loader, loss_fn, optimizer, epoch):
     model.train()
@@ -318,10 +254,6 @@ def model_fit(device, model, loaders, loss_fn, optimizer, scheduler, num_epochs,
     print(f"\nBest val accuracy: {best_val_acc:.2f}%")
     return history
 
-
-# ════════════════════════════════════════════════════════════════════════════
-# Main
-# ════════════════════════════════════════════════════════════════════════════
 
 def parse_args():
     p = argparse.ArgumentParser(description="Train a CNN on the MAMe dataset.")

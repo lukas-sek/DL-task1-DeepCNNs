@@ -1,18 +1,3 @@
-#!/bin/bash
-# Phase 3 — Standard CNN — Regularized (best generalisation)
-# Adds BatchNorm + Dropout + Augmentation + Weight decay + Cosine LR schedule
-# Goal: close the gap between train and val accuracy
-#
-# sbatch -A nct_367 -q acc_training launcher-std-regularized.sh
-
-#SBATCH --job-name="std-reg"
-#SBATCH --chdir=.
-#SBATCH --output=logs/std-reg_%j.out
-#SBATCH --error=logs/std-reg_%j.err
-#SBATCH --time=06:00:00
-#SBATCH --cpus-per-task=40
-#SBATCH --gres=gpu:1
-
 mkdir -p logs
 
 module purge

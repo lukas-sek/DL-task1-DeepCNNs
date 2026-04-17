@@ -1,15 +1,3 @@
-#!/bin/bash
-# collect_results.sh
-# Pull all experiment results from BSC back to local machine.
-# Run from the CNN/ folder on your local machine:
-#
-#   bash collect_results.sh
-#
-# Copies:
-#   - runs/*/results.json   (metrics, history, confusion matrix)
-#   - runs/*/config.json
-#   - logs/*.out            (SLURM stdout — useful for debugging)
-
 BSC_USER="nct01204"
 BSC_HOST="alogin1.bsc.es"
 REMOTE_DIR="~/DL-Lab-CNN"

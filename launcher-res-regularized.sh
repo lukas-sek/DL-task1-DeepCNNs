@@ -1,17 +1,3 @@
-#!/bin/bash
-# Phase 3 — Residual CNN (non-standard) — Regularized (best generalisation)
-# Dropout on the GAP→FC head + augmentation + weight decay + cosine schedule
-#
-# sbatch -A nct_367 -q acc_training launcher-res-regularized.sh
-
-#SBATCH --job-name="res-reg"
-#SBATCH --chdir=.
-#SBATCH --output=logs/res-reg_%j.out
-#SBATCH --error=logs/res-reg_%j.err
-#SBATCH --time=06:00:00
-#SBATCH --cpus-per-task=40
-#SBATCH --gres=gpu:1
-
 mkdir -p logs
 
 module purge

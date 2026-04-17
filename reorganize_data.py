@@ -1,20 +1,3 @@
-"""
-reorganize_data.py
-------------------
-Run on BSC after downloading the Kaggle zip.
-Moves all images from the flat data/ folder into:
-    ~/DL-Lab-CNN/data/train/<class>/
-    ~/DL-Lab-CNN/data/val/<class>/
-    ~/DL-Lab-CNN/data/test/<class>/
-
-Usage:
-    python3 ~/DL-Lab-CNN/reorganize_data.py
-
-Expects:
-    /tmp/mame_raw/data/           <- flat folder of all images
-    /tmp/mame_raw/MAMe_dataset.csv
-"""
-
 import csv
 import shutil
 from pathlib import Path
