@@ -18,4 +18,4 @@ mkdir -p logs_bsc
 scp "${BSC_USER}@${BSC_HOST}:${REMOTE_DIR}/logs/*.out" logs_bsc/ 2>/dev/null
 
 echo ""
-echo "Done. Run python plot_results.py --runs runs/ --out_dir figures/ to generate plots."
+echo "Run python plot_results.py --runs runs/ --out_dir figures/ to generate plots."
